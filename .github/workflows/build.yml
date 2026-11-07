@@ -12,7 +12,7 @@ jobs:
 
       - name: Giai nen
         run: |
-          unzip -q kryzex-srcV3-java21.zip -d /tmp/src
+          unzip -q kryzex-srcV3-java21-fixedV2.zip -d /tmp/src
 
       - uses: actions/setup-java@v4
         with:
