@@ -12,7 +12,9 @@ jobs:
 
       - name: Giai nen
         run: |
-          unzip -q kryzex-srcV3-java21-fixedV2.zip -d /tmp/src
+          unzip -q *.zip -d /tmp/src
+          SRCDIR=$(find /tmp/src -name "gradlew" -type f | head -1 | xargs dirname)
+          echo "SRCDIR=$SRCDIR" >> $GITHUB_ENV
 
       - uses: actions/setup-java@v4
         with:
@@ -22,7 +24,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build
-        working-directory: /tmp/src
+        working-directory: ${{ env.SRCDIR }}
         run: |
           sed -i '/org.gradle.java.home/d' gradle.properties || true
           chmod +x gradlew
@@ -34,14 +36,14 @@ jobs:
         with:
           name: kryzex-normal
           path: |
-            /tmp/src/build/libs/kryzex-*.jar
-            !/tmp/src/build/libs/*-obf.jar
-            !/tmp/src/build/libs/*-sources.jar
+            ${{ env.SRCDIR }}/build/libs/kryzex-*.jar
+            !${{ env.SRCDIR }}/build/libs/*-obf.jar
+            !${{ env.SRCDIR }}/build/libs/*-sources.jar
 
       - name: Ban obf
         uses: actions/upload-artifact@v4
         with:
           name: kryzex-obf
           path: |
-            /tmp/src/build/libs/*-obf.jar
-            /tmp/src/build/libs/mapping.txt
+            ${{ env.SRCDIR }}/build/libs/*-obf.jar
+            ${{ env.SRCDIR }}/build/libs/mapping.txt
