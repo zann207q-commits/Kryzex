@@ -19,7 +19,7 @@ jobs:
 
       - name: Build
         run: |
-          sed -i '/org.gradle.java.home/d' gradle.properties
+          sed -i '/org.gradle.java.home/d' gradle.properties || true
           chmod +x gradlew
           ./gradlew build --no-daemon --stacktrace
           ls -la build/libs
