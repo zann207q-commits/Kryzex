@@ -1,0 +1,48 @@
+name: Build Kryzex
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Giai nen src
+        run: |
+          mkdir -p /tmp/src
+          unzip -q kryzex-srcV3-java21.zip -d /tmp/src
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build (thuong + obf)
+        working-directory: /tmp/src
+        run: |
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          chmod +x gradlew
+          ./gradlew build --no-daemon --stacktrace
+          ls -la build/libs
+
+      - name: Ban thuong
+        uses: actions/upload-artifact@v4
+        with:
+          name: kryzex-normal
+          path: |
+            /tmp/src/build/libs/kryzex-*.jar
+            !/tmp/src/build/libs/*-obf.jar
+            !/tmp/src/build/libs/*-sources.jar
+
+      - name: Ban obf
+        uses: actions/upload-artifact@v4
+        with:
+          name: kryzex-obf
+          path: |
+            /tmp/src/build/libs/*-obf.jar
+            /tmp/src/build/libs/mapping.txt
